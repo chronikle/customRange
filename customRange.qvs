@@ -1,0 +1,30 @@
+Sub customRange(_src, _val, _fld, _t, _f)
+
+  LET rows = NoOfRows('$(_t)')-1;
+  LET field = chr(39) & '$(_f)' & chr(39);
+  SET h = '< ' & FieldValue($(field),1);
+  LET makeIf = 'if($(_val) < FieldValue($(field),1), $(h),';
+
+  for i=2 to $(rows);
+
+    LET h = FieldValue($(field),$(i))-1;
+    SET replaceW = FieldValue($(field),$(i)-1) & ' - ' & $(h);
+    makeIf = makeIf & 'if($(_val) < FieldValue($(field),$(i)), $(replaceW),';
+
+  next i;
+
+  SET h = '> ' & FieldValue($(field),$(rows));
+  makeIf = '$(makeIf)' & '$(h)' & Repeat(')', $(rows));
+
+  LET _tblname = 'temp' & Floor(rand()*1000);
+
+  [$(_tblname)]:
+  LOAD 
+      *,
+      $(makeIf) as [$(_fld)]
+  Resident $(_src);
+
+  drop tables $(_src), $(_t);
+  rename table $(_tblname) to $(_src);
+  
+End Sub;

@@ -1,0 +1,38 @@
+/* 
+You need a table containing range borders on one column
+Each new row will represent the higher number of a range
+
+You can then use the Subroutine as is or import it from a qvs
+
+Field names are described below
+
+*/
+
+[x]:
+LOAD * INLINE [
+y
+18
+22
+23
+25
+56
+66
+];
+
+test:
+Load
+	15+RowNo() as varsta
+Autogenerate(50);
+
+
+$(Include=lib://test/customRange.qvs); 
+
+/*
+$1 = Source table
+$2 = Field to calculate range from
+$3 = Name of newly created range field
+$4 = Name of table containing range borders (each row will represent the higher number of a range)
+$5 = Name of field with range borders
+*/
+
+Call customRange('test','varsta','grupa', 'x', 'y');
